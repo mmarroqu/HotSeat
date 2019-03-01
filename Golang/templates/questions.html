@@ -1,0 +1,93 @@
+<!doctype html>
+<!--
+Copyright 2018 The Go Authors. All rights reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file.
+-->
+<html>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+
+<head>
+	<meta charset="utf-8">
+	<title>Go wasm</title>
+
+	<style>
+		@font-face { font-family: Bit; src: url("8-BIT WONDER.TTF"); }
+		h1 { font-family: Bit, sans-serif; color: white; text-align: center; padding: 10px;font-size: 50px;}
+		body { background: black; text-align: center; margin-top: 100px;}
+		input[type=text], select {
+  		width: 50%;
+  		padding: 12px 20px;
+  		margin: 8px 0;
+  		display: inline-block;
+  		border: 1px solid #ccc;
+  		border-radius: 4px;
+  		box-sizing: border-box;
+			font-family: Helvetica;
+		}
+</style>
+</head>
+
+<body>
+
+	<script src="wasm_exec.js"></script>
+
+	<script>
+		if (!WebAssembly.instantiateStreaming) { // polyfill
+			WebAssembly.instantiateStreaming = async (resp, importObject) => {
+				const source = await (await resp).arrayBuffer();
+				return await WebAssembly.instantiate(source, importObject);
+			};
+		}
+
+		const go = new Go();
+
+		let mod, inst;
+
+		WebAssembly.instantiateStreaming(fetch("lib.wasm"), go.importObject).then((result) => {
+			mod = result.module;
+			inst = result.instance;
+			document.getElementById("runButton").disabled = false;
+		});
+
+		async function run() {
+			await go.run(inst);
+			inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
+		}
+
+		function startTimer(duration, display) {
+    var timer = duration, minutes, seconds;
+    setInterval(function () {
+        minutes = parseInt(timer / 60, 10)
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = minutes + ":" + seconds;
+
+        if (--timer < 0) {
+            timer = duration;
+        }
+    }, 1000);
+}
+
+window.onload = function () {
+    var fiveMinutes = 60 * 5,
+        display = document.querySelector('#time');
+    startTimer(fiveMinutes, display);
+};
+
+	</script>
+
+	<img src="https://i.pinimg.com/originals/66/39/bf/6639bf09e1bf4b112ebe6a6935909b70.png" width="50">
+	<h1>HotSeat</h1>
+	<div>Registration closes in <span id="time">05:00</span> minutes!</div>
+
+	<input type="text" name="Question" placeholder="Enter Your Question..."><br>
+	<button onClick="run();" id="runButton">Run</button>
+
+</body>
+</html>
