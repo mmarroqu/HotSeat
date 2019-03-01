@@ -1,7 +1,7 @@
 package main
 
 import (
-   // "encoding/json"
+    "encoding/json"
     "log"
     "net/http"
     "github.com/gorilla/mux"
@@ -12,13 +12,13 @@ import (
 
 var players [] string
 var questions [] string
-
+var numQuestions = 0
 // our main function
 func main() {
     router := mux.NewRouter()
     router.HandleFunc("/start", PostPlayer).Methods("POST")
-    router.HandleFunc("/game/", GetQuestion).Methods("GET")
-    router.HandleFunc("/game/", SendQuestion).Methods("POST")
+    router.HandleFunc("/game", GetQuestion).Methods("GET")
+    router.HandleFunc("/game", SendQuestion).Methods("POST")
 
     log.Fatal(http.ListenAndServe(":8000", router))
 }
@@ -38,8 +38,18 @@ func PostPlayer(w http.ResponseWriter, r *http.Request) {
 
 
 func GetQuestion(w http.ResponseWriter, r *http.Request) {
-   
+	if(numQuestions>0){
+    	q := questions[len(questions)-1]
+    	questions = questions[:len(questions)-1]
+    	json.NewEncoder(w).Encode(q)
+    	numQuestions--
+
+    }else{
+    	json.NewEncoder(w).Encode("No Questions Left")
+    }
+
 }
+
 
 func SendQuestion(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
@@ -47,6 +57,7 @@ func SendQuestion(w http.ResponseWriter, r *http.Request) {
     question := r.Form["question"][0]
 
     questions = append(questions,question)
+    numQuestions++
     fmt.Print("Current Questions: ")
     fmt.Println(questions)
 }
