@@ -1,16 +1,14 @@
 package main
 
 import (
-    "encoding/json"
+   // "encoding/json"
     "log"
     "net/http"
     "github.com/gorilla/mux"
     "fmt"
 )
 
-type test_struct struct {
-	Test string
-}
+
 
 var players [] string
 var questions [] string
@@ -27,19 +25,15 @@ func main() {
 
 
 func PostPlayer(w http.ResponseWriter, r *http.Request) {
-    /*params := mux.Vars(r)
-    var person string
-    _ = json.NewDecoder(r.Body).Decode(&person)
-    fmt.Println(params["name"])
-	*/
-	decoder := json.NewDecoder(r.ParseForm())
-	var t test_struct
-	err := decoder.Decode(&t)
-	if err != nil {
-		panic(err)
-	}
-  	fmt.Println(t.Test)
+    r.ParseForm()
+    fmt.Println("Name received:" + r.Form["name"][0])
+    person := r.Form["name"][0]
 
+    players=append(players,person)
+    fmt.Print("Current players: ")
+    fmt.Println(players)
+   
+	
 }
 
 
@@ -48,5 +42,11 @@ func GetQuestion(w http.ResponseWriter, r *http.Request) {
 }
 
 func SendQuestion(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+    fmt.Println("Question received:" + r.Form["question"][0])
+    question := r.Form["question"][0]
 
+    questions = append(questions,question)
+    fmt.Print("Current Questions: ")
+    fmt.Println(questions)
 }
