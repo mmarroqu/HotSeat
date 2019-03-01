@@ -8,6 +8,10 @@ import (
     "fmt"
 )
 
+type test_struct struct {
+	Test string
+}
+
 var players [] string
 var questions [] string
 
@@ -23,12 +27,19 @@ func main() {
 
 
 func PostPlayer(w http.ResponseWriter, r *http.Request) {
-    params := mux.Vars(r)
+    /*params := mux.Vars(r)
     var person string
     _ = json.NewDecoder(r.Body).Decode(&person)
     fmt.Println(params["name"])
+	*/
+	decoder := json.NewDecoder(r.ParseForm())
+	var t test_struct
+	err := decoder.Decode(&t)
+	if err != nil {
+		panic(err)
+	}
+  	fmt.Println(t.Test)
 
-  
 }
 
 
