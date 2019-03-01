@@ -2,12 +2,12 @@ package main
 
 import (
 	"net/http"
-	//"net/url"
+	"net/url"
 	"log"
 	//"io/ioutil"
 	"encoding/json"
-	"bytes"
-	"fmt"
+	//"bytes"
+	//"fmt"
 )
 
 func main() {
@@ -15,12 +15,13 @@ func main() {
 }
 
 func MakeRequest() {
-
+	name := "manuel"
 	formData := url.Values{
-		"name": {"masnun"},
+		"name": {name},
 	}
 
-	resp, err := http.PostForm("https://httpbin.org/post", formData)
+
+	resp, err := http.PostForm("http://localhost:8000/start", formData)
 	if err != nil {
 		log.Fatalln(err)
 	}
