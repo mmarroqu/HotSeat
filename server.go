@@ -4,8 +4,10 @@ import (
     "encoding/json"
     "log"
     "net/http"
+    "net/url"
     "github.com/gorilla/mux"
     "fmt"
+    "math/rand"
 )
 
 
@@ -38,14 +40,29 @@ func PostPlayer(w http.ResponseWriter, r *http.Request) {
 
 
 func GetQuestion(w http.ResponseWriter, r *http.Request) {
+   
+    //playerIndex := rand.Intn(len(players))
+    //fmt.Println(questionIndex)
 	if(numQuestions>0){
-    	q := questions[len(questions)-1]
+        // Get random player and question
+        questionIndex := rand.Intn(len(questions))
+        playerIndex := rand.Intn(len(players))
+    	q := questions[questionIndex]
+        playerName := players[playerIndex]
+
+        // Remove Question from list of questions
+        questions[questionIndex] = questions[len(questions)-1]
     	questions = questions[:len(questions)-1]
-    	json.NewEncoder(w).Encode(q)
+        formData := url.Values{
+            "question": {q},
+            "name": {playerName},
+         }
+
+    	json.NewEncoder(w).Encode(formData)
     	numQuestions--
 
     }else{
-    	json.NewEncoder(w).Encode("No Questions Left")
+    	json.NewEncoder(w).Encode(nil)
     }
 
 }
