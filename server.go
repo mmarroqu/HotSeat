@@ -15,12 +15,14 @@ import (
 var players [] string
 var questions [] string
 var numQuestions = 0
+var numPlayers = 0
 // our main function
 func main() {
     router := mux.NewRouter()
     router.HandleFunc("/start", PostPlayer).Methods("POST")
     router.HandleFunc("/game", GetQuestion).Methods("GET")
     router.HandleFunc("/game", SendQuestion).Methods("POST")
+    router.HandleFunc("/reset", ResetGame).Methods("GET")
 
     log.Fatal(http.ListenAndServe(":8000", router))
 }
@@ -30,7 +32,7 @@ func PostPlayer(w http.ResponseWriter, r *http.Request) {
     r.ParseForm()
     fmt.Println("Name received:" + r.Form["name"][0])
     person := r.Form["name"][0]
-
+    numPlayers++
     players=append(players,person)
     fmt.Print("Current players: ")
     fmt.Println(players)
@@ -43,7 +45,7 @@ func GetQuestion(w http.ResponseWriter, r *http.Request) {
    
     //playerIndex := rand.Intn(len(players))
     //fmt.Println(questionIndex)
-	if(numQuestions>0){
+	if(numQuestions>0 && numPlayers > 0){
         // Get random player and question
         questionIndex := rand.Intn(len(questions))
         playerIndex := rand.Intn(len(players))
@@ -77,4 +79,17 @@ func SendQuestion(w http.ResponseWriter, r *http.Request) {
     numQuestions++
     fmt.Print("Current Questions: ")
     fmt.Println(questions)
+}
+
+
+func ResetGame(w http.ResponseWriter, r *http.Request) {
+    numQuestions = 0
+    numPlayers = 0
+    players = nil
+    questions = nil
+
+        
+    json.NewEncoder(w).Encode("New Game Started!")
+    
+
 }
