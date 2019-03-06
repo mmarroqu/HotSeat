@@ -29,6 +29,7 @@ func main() {
 
 
 func PostPlayer(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Access-Control-Allow-Origin", "*")
     r.ParseForm()
     fmt.Println("Name received:" + r.Form["name"][0])
     person := r.Form["name"][0]
@@ -42,7 +43,7 @@ func PostPlayer(w http.ResponseWriter, r *http.Request) {
 
 
 func GetQuestion(w http.ResponseWriter, r *http.Request) {
-   
+    w.Header().Set("Access-Control-Allow-Origin", "*")
     //playerIndex := rand.Intn(len(players))
     //fmt.Println(questionIndex)
 	if(numQuestions>0 && numPlayers > 0){
@@ -71,7 +72,8 @@ func GetQuestion(w http.ResponseWriter, r *http.Request) {
 
 
 func SendQuestion(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+    r.ParseForm()
     fmt.Println("Question received:" + r.Form["question"][0])
     question := r.Form["question"][0]
 
@@ -83,6 +85,7 @@ func SendQuestion(w http.ResponseWriter, r *http.Request) {
 
 
 func ResetGame(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Access-Control-Allow-Origin", "*")
     numQuestions = 0
     numPlayers = 0
     players = nil
